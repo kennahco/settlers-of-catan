@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+	<title>Kennah Tries To Make Settlers Of Catan</title>
+	<link href="https://fonts.googleapis.com/css?family=Crimson+Text:400,500,600,700&display=swap" rel="stylesheet">
+    
+    <style>
+
+        body {
+            margin: 0;
+            background-color: oldlace;
+            font-family: Crimson Text, serif;
+            text-align: center;
+            color: #4F3007;
+        }
+
+        p {
+            margin: 0;
+        }
+        
+        button {
+            display: block;
+            font-family: Crimson Text, serif;
+            color: #4F3007;
+            font-weight: 600;
+            line-height: 1;
+            background-image: url('images/texture.png');
+            border-color: #996823;
+            border-width: 1px;
+            border-radius: 2px;
+            padding: 6px 5px 3px;
+            margin: 5%;
+        }
+
+        button:focus {
+            outline:0;
+        }
+
+        button:hover {
+            cursor: pointer;
+        }
+
+        button:disabled {
+            border-color: #99682380;
+            color: #996823AA;
+            background-image: url('images/texture-disabled.png');
+            cursor: default;
+        }
+
+        #wrapper {
+            display: flex;
+            height: 100vh;
+	        width: 100%;
+            justify-content: center;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 30vh;
+        }
+        
+        #dice {
+            width: 40%;
+        }
+
+        #diceNum {
+            margin: 10% auto;
+            font-size: 2.5rem;
+            color: #BC202B;
+        }
+
+        #dice-top {
+            margin-bottom: 10%;
+        }
+
+        #dice-top:after {
+	        visibility: hidden;
+	        display: block;
+	        font-size: 0;
+	        content: " ";
+	        clear: both;
+	        height: 0;
+	    }
+
+        .dice-img {
+            padding: 0;
+            width: 40%;
+        }
+
+        #diceA {
+            float: left;
+        }
+
+        #diceB {
+            float: right;
+            animation-delay: 0.1s;
+        }
+
+        .rolling {
+            animation-name: roll;
+            animation-duration: 1s;
+            animation-iteration-count: 1;
+        }
+
+        @keyframes roll {
+            0% {
+                animation-timing-function: cubic-bezier(.24,.62,.75,.99);
+                transform: translate(0, -5%) rotate(0deg);
+            }
+            40% {
+                animation-timing-function: cubic-bezier(.41,.01,.92,.67);
+                transform: translate(0, -70%) rotate(270deg);
+            }
+            60% {
+                animation-timing-function: cubic-bezier(.24,.62,.75,.99);
+                transform: translate(0, -5%) rotate(330deg);
+            }
+            85% {
+                animation-timing-function: cubic-bezier(.41,.01,.92,.67);
+                transform: translate(0, -50%) rotate(345deg);
+            }
+            100% {
+                transform: translate(0, -5%) rotate(360deg);
+            }
+        }
+
+        #rollButton {
+            margin: auto;
+        }
+
+        #column-middle {
+            flex: 0 0 70vh;
+        }
+
+        #caption {
+            display: flex;
+            flex: 1 1 10vh;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+
+        #board-wrapper-border {
+            display: flex;
+	        position: relative;
+	        flex: 0 0 calc(75vh * 0.86667);
+            width: 75vh;
+	        background-color: #926A24;	
+	        background-size: cover;
+	        clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+	        justify-content: center;
+	        align-items: center;
+        }
+
+        #board-wrapper-img {
+            display: flex;
+	        position: relative;
+	        height: calc(100% - 3px);
+            width: calc(100% - 3px);
+	        background-color: oldlace;	
+	        background-image: url('images/texture.png');
+	        background-size: cover;
+	        clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+	        justify-content: center;
+	        align-items: center;
+        }
+        
+        #board {
+            display: flex;
+	        position: relative;
+            height: 95%;
+            width: 95%;;
+	        background-color: skyblue;	
+	        background-image: url('images/sea.png');
+	        background-size: cover;
+	        clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+	        justify-content: center;
+	        align-items: center;
+        }
+
+        #tiles {
+            position: absolute;
+            width: 75%;
+            overflow: visible;
+        }
+
+        #builds {
+            position: absolute;
+            width: 75%;
+            overflow: visible;
+        }
+
+        #hand-wrapper {
+            flex: 1 1 20vh;
+        }
+
+        #actions {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .token {
+	        r: 5;
+	        fill: #f7eee1;
+        }
+
+        .tokenNum {
+        	font-size: 0.3rem;
+        	fill: black;
+        	font-weight: 600;
+        	text-anchor: middle;
+        	alignment-baseline: middle;
+        }
+
+        .side {
+	        stroke:#BC202B;
+	        stroke-dasharray: 2, 0.5;
+	        stroke-width: 0.8;
+            transition: stroke .2s;
+            animation-name: side-grow;
+	        animation-duration: .8s;
+	        animation-iteration-count: infinite;
+	        animation-timing-function: linear;
+        }
+
+        @keyframes side-grow {
+    	    0% {
+		        stroke-width: 0.8;
+    	    }
+	        50% {
+		        stroke-width: 1.2;
+    	        }
+	        100% {
+		        stroke-width: 0.8;
+	        }
+        }
+
+        .side-area {
+            stroke: rgba(0, 0, 0, 0);
+            stroke-width: 3;
+        }
+
+        .vertex {
+	    r: 1;
+	    fill: #BC202B;
+	    transition: fill .2s;
+	    stroke: rgba(0, 0, 0, 0);
+	    stroke-width: 4;
+	
+	    animation-name: vertex-grow;
+	    animation-duration: .8s;
+	    animation-iteration-count: infinite;
+	    animation-timing-function: linear;
+        }
+
+        .vertex:hover {
+            fill: #EF9B00;
+        }
+
+        @keyframes vertex-grow {
+    	    0% {
+       	    	r: 1;
+    	    }
+	        50% {
+       	    	r: 1.5;
+    	    }
+	        100% {
+		    r: 1;
+	        }
+        }
+
+        .road {
+            stroke-width: 1.5
+        }
+
+        .road-cursor-red:hover {
+            cursor: url('images/road-cursor-red.png'), auto;
+        } 
+
+        .road-cursor-orange:hover {
+            cursor: url('images/road-cursor-orange.png'), auto;
+        } 
+
+        .road-cursor-green:hover {
+            cursor: url('images/road-cursor-green.png'), auto;
+        } 
+
+        .road-cursor-blue:hover {
+            cursor: url('images/road-cursor-blue.png'), auto;
+        } 
+
+        .road-cursor-brown:hover {
+            cursor: url('images/road-cursor-brown.png'), auto;
+        } 
+
+        .road-cursor-white:hover {
+            cursor: url('images/settle-cursor-white.png'), auto;
+        } 
+
+        .settle-cursor-red:hover {
+            cursor: url('images/settle-cursor-red.png'), auto;
+        } 
+
+        .settle-cursor-orange:hover {
+            cursor: url('images/settle-cursor-orange.png'), auto;
+        } 
+
+        .settle-cursor-green:hover {
+            cursor: url('images/settle-cursor-green.png'), auto;
+        } 
+
+        .settle-cursor-blue:hover {
+            cursor: url('images/settle-cursor-blue.png'), auto;
+        } 
+
+        .settle-cursor-brown:hover {
+            cursor: url('images/settle-cursor-brown.png'), auto;
+        } 
+
+        .settle-cursor-white:hover {
+            cursor: url('images/settle-cursor-white.png'), auto;
+        } 
+
+        #action-grid {
+            display: grid;
+            width: 100%;
+            height: 100%;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 2fr 2fr 1fr;
+        }
+
+        #endButton {
+            grid-column: 1 / 3;
+        }
+
+    </style>
+</head>
+
+<body onload="initPage()">
+
+    <script>
+
+    //SVG link
+    var svgNS = "http://www.w3.org/2000/svg";
+
+    var dirs = {
+	// Cube directions.
+	    0: [+1, 0, -1],
+        1: [+1, -1, 0],
+        2: [0, -1, +1],
+	    3: [-1, 0, +1],
+	    4: [-1, +1, 0],
+	    5: [0, +1, -1]
+	/*
+		  3    4
+		2  tile  5
+		  1    0
+	*/
+    }
+
+    var tileImg = {
+	// Images for hex tiles.
+	    0 : "images/brick.png",
+	    1 : "images/sheep.png",
+	    2 : "images/stone.png",
+	    3 : "images/wheat.png",
+	    4 : "images/wood.png",
+	    5 : "images/desert.png"
+    }
+
+    var colours = ["red", "orange", "green", "blue", "brown", "white"]
+
+    var roadColours = {
+    // Colours for roads.
+        0: "#A30F1C", //red
+        1: "#E47900", //orange
+        2: "#008148", //green
+        3: "#09559A", //blue
+        4: "#843915", //brown
+        5: "#CACACA" //white
+    }
+
+    var settleImgs = []
+    var cityImgs = []
+    var roadCursors = []
+    var settleCursors = []
+    var cityCursors = []
+    
+    for(i = 0; i < colours.length; i++) {
+        settleImgs[i] = "images/settle-" + colours[i] + ".png";
+        cityImgs[i] = "images/city-" + colours[i] + ".png";
+        roadCursors[i] = "road-cursor-" + colours[i];
+        settleCursors[i] = "settle-cursor-" + colours[i];
+        cityCursors[i] = "city-cursor-" + colours[i];
+    }
+
+
+    // Amount of each tile in a traditional Catan game. 
+    var tileAvailable = [0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5];
+
+    // And amount of each token.
+    var tokensAvailable = [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12];
+
+    // Variables
+    var tile = [];
+    var side = [];
+    var vertex = [];
+    var player = [];
+    var stage;
+
+    // Player
+    var localNum, localPlayer
+    var localCard = [];
+
+    // Area of tiles & calculations.
+    var tiles = new Object();
+    var tw, th;
+
+    // For development key commands.
+    document.onkeydown = checkKeycode
+
+    function checkKeycode(e) {
+	    var keycode;
+	    keyBuffer="";
+	    if(window.event) {
+		    keycode = window.event.keyCode;
+	    } else if(e) {
+		    keycode = e.which;
+	    }
+    }
+
+    function moveDir(hex) {
+	    // Changes coordinates of inputted hex. Used during building of tiles.
+        var buildDirs = {
+    		0: 2,
+    		1: 3,
+    		2: 4,
+    		3: 5,
+    		4: 0,
+    		5: 1
+    	}
+    	hex.x += dirs[buildDirs[hex.dir]][0];
+    	hex.y += dirs[buildDirs[hex.dir]][1];
+    	hex.z += dirs[buildDirs[hex.dir]][2];
+    }
+
+    function findDir(x, y, z, dir) {
+	    // Returns hex in the direction specified. Used to find neighbours.
+	    x += dirs[dir][0];
+	    y += dirs[dir][1];
+	    z += dirs[dir][2];
+	    for(all = 0; all < tile.length; all++) {
+	    	if(tile[all].x == x && tile[all].y == y && tile[all].z == z) {
+	    		return tile[all];
+	    	}
+	    }
+	    return undefined;
+    }
+
+    function initPage() {
+        initBoard();
+        initPlayers();
+        updateStage("choose-player");
+    }
+
+    function initBoard() {
+        // Calculate sizes.
+        tiles.elem = document.getElementById("tiles");
+
+        // Set the height of the tiles element based on width.
+        tiles.elem.style.height = (tiles.elem.offsetWidth * (12 / 13)) + "px";
+
+
+	    tiles.width = 100;
+	    tiles.height = 100 * (12 / 13);
+        tw = tiles.width / 5;
+        th = tiles.height / 4;
+
+        builds = document.getElementById("builds");
+
+        // Build grid.
+        buildTiles();
+	    buildSides();
+	    buildVertices();
+        findAdj();
+
+        drawBoard();
+    }
+
+    function buildTiles() {
+	    // B is for builder: builder will move around and create tiles at its location.
+	    var b = new Object();
+	    b.num = -1;
+	    b.x = 0;
+	    b.y = 0;
+	    b.z = 0;
+	    b.dir = 0;
+	
+	    for(c = 0; c < 3; c++) {
+		    createTile(b);
+		    for(d = 0; d < 6; d++) {
+    			// Change the direction clockwise and then return to moving.
+    			b.dir = d;
+    			for(n = 0; n < c; n++) {
+    				// Move in the specified direction until edge is reached.
+    				moveDir(b);
+    				// If on last tile before moving out, do not create new tile.
+    				if(d != 5 || n != (c-1)) {
+    					createTile(b);
+    				}
+				}
+			}
+		// Move outwards.
+		b.dir = 4;
+		moveDir(b);
+        }
+
+        // Sides and vertices depend on this calculation so needs to be before buildSides/buildVertices.
+        // Find tile adjacents.
+        for(i = 0; i < tile.length; i++) {
+		    let t = tile[i];
+            //Add all adjacent tiles.
+            for(d = 0; d < 6; d++) {
+			    // J is the adJacent tile, returns undefined when no adjacent.
+			    let j = findDir(t.x, t.y, t.z, d);
+			    if(!j) continue;
+
+                // Set J as tile's adjacent.
+                t.adj[d] = j;
+                // Set tile as J's adjacent opposite.
+                if(d < 3) {
+                    j.adj[d + 3] = t;
+                } else {
+                    j.adj[d - 3] = t;
+                }
+            }    
+        }
+	}
+
+    function createTile(hex) {
+	    // Numerate tiles.
+	    var n = tile.length;
+
+	    tile[n] = new Object();
+	    tile[n].num = n;
+	    tile[n].x = hex.x;
+	    tile[n].y = hex.y;
+	    tile[n].z = hex.z;
+	    // Recalculate location variables when called.
+	    tile[n].sx = function() {
+	    	// Square x is the center of the board, moved horizontally according to x, and then according to z.
+	    	var sx = Math.round(((tiles.width / 2 - tw / 2) + (tw * this.x) + (tw / 2) * this.z) * 1000) / 1000;
+	    	return sx;
+	    };
+	    tile[n].sz = function() {
+	    	// Square z is the center of the board, moved vertically by a 3/4 tile offset according to z.
+	    	var sz = Math.round(((tiles.height / 2 - th / 2) + (th * (3/4) * this.z)) * 1000) / 1000;
+	    	return sz;
+	    };
+
+        // Point locations.
+	    var ax = tile[n].sx() + tw/2;
+	    var bx = tile[n].sx() + tw;
+	    var cx = tile[n].sx() + tw;
+	    var dx = tile[n].sx() + tw/2;
+	    var ex = tile[n].sx();
+	    var fx = tile[n].sx();	
+	    var ay = tile[n].sz();
+	    var by = tile[n].sz() + th/4;
+	    var cy = tile[n].sz() + th*(3/4);
+	    var dy = tile[n].sz() + th;
+	    var ey = tile[n].sz() + th*(3/4);
+        var fy = tile[n].sz() + th/4;
+        
+        tile[n].xCoords = [ax, bx, cx, dx, ex, fx]
+        tile[n].yCoords = [ay, by, cy, dy, ey, fy]
+
+        // Adjacent tiles.
+        tile[n].adj = [];
+
+        // Bordering sides.
+        tile[n].sides = [];
+
+        // Bordering vertices.
+        tile[n].vertices = [];
+
+	    // Select tile resource from tiles remaining.
+	    var randomizer = Math.floor(Math.random() * tileAvailable.length);
+	    tile[n].resource = tileAvailable[randomizer];
+	    tileAvailable.splice(randomizer, 1);
+
+        // Tile element, for filling later.
+	    tile[n].elem = undefined;
+
+	// Select tile token from tokens remaining.
+	    if(tile[n].resource != 5) {
+		    randomizer = Math.floor(Math.random() * tokensAvailable.length);
+		    tile[n].token = tokensAvailable[randomizer];
+		    tokensAvailable.splice(randomizer, 1);
+		    tile[n].tokenElem = undefined;	
+	    }
+
+    }
+
+    function drawTile(t) {
+	    //Creates an SVG image element for each individual tile.
+	    var newTile = document.createElementNS(svgNS, "image");
+	    newTile.setAttributeNS(null, "id", "tile" + t.num);
+	    newTile.setAttributeNS(null, "x", t.sx());
+	    newTile.setAttributeNS(null, "y", t.sz());
+	    newTile.setAttributeNS(null, "width", tw);
+	    newTile.setAttributeNS(null, "height", th);
+	    newTile.setAttributeNS(null, "class", "tile");
+	    newTile.setAttributeNS(null, "href", tileImg[t.resource]);
+	    tiles.elem.appendChild(newTile);
+	    return newTile;
+    }
+
+    function drawToken(t) {
+        // Creates an SVG circle element and text element for each token.
+        var x = t.sx() + tw/2;
+	    var y = t.sz() + th/2;
+
+        // Circle background.
+        var newToken = document.createElementNS(svgNS, "circle");
+	    newToken.setAttributeNS(null, "id", "token" + t.num);
+	    newToken.setAttributeNS(null, "cx", x);
+	    newToken.setAttributeNS(null, "cy", y);
+	    newToken.setAttributeNS(null, "class", "token");
+	    tiles.elem.appendChild(newToken);
+	
+        // Number.
+	    var newNum = document.createElementNS(svgNS, "text");
+	    newNum.setAttributeNS(null, "id", "tokenNum" + t.num);
+	    newNum.setAttributeNS(null, "x", x);
+	    newNum.setAttributeNS(null, "y", y);
+	    newNum.setAttributeNS(null, "class", "tokenNum");
+        // 6 and 8 are coloured red.
+        if(t.token == 6 || t.token == 8) newNum.style.fill = "#BC202B";
+        // Dots below to represent frequency of roll.
+	    var dot = "."
+	    newNum.innerHTML = "<tspan x='" + x + "' dy='1'>" + t.token + "</tspan><tspan x='" + x + "' dy='1.7'>" + dot.repeat(6 - Math.abs(7 - t.token)) + "</tspan>";
+	    tiles.elem.appendChild(newNum);
+
+	    var token = [newToken, newNum];
+        return token;
+    }
+
+    function buildSides() {
+        for(i = 0; i < tile.length; i++) {
+            let t = tile[i];
+            for(d = 0; d < 6; d++) {
+                // d represents each Direction,
+                // p represents the oPposite direction,
+                // j represents the Adjacent direction.
+                let p, j;
+                if(d < 3) {
+                    p = d + 3;
+                } else {
+                    p = d - 3;
+                }
+                if(d == 5) {
+                    j = 0;
+                } else {
+                    j = d + 1;
+                }
+                // Check if side already exists on its own tile or the adjacent tile, if applicable.
+                if(!t.sides[d] && (!t.adj[d] || !t.adj[d].sides[p])) {
+                    // Add side to tile object and to adjacent if applicable.
+                    t.sides[d] = createSide(t, t.adj[d], t.xCoords[d], t.yCoords[d], t.xCoords[j], t.yCoords[j]);
+                    if(t.adj[d]) t.adj[d].sides[p] = t.sides[d];
+                }
+            }
+        }
+    }
+
+    function createSide(t, j, x1, y1, x2, y2) {
+	    var n = side.length;
+	
+	    side[n] = new Object();
+	    side[n].num = n;
+	    side[n].x1 = x1;
+	    side[n].y1 = y1;
+	    side[n].x2 = x2;
+	    side[n].y2 = y2;
+	
+	    side[n].tiles = [t, j];
+
+	    side[n].adj = [];
+	    side[n].vertices = [];
+
+	    side[n].build = undefined;
+
+	    return side[n];
+    }
+
+    function drawSide(s) {
+        //Creates an SVG line element for each individual side.
+	    var newSide = document.createElementNS(svgNS, "line");
+	    newSide.setAttributeNS(null, "id", "side" + s.num);
+	    newSide.setAttributeNS(null, "x1", s.x1);
+	    newSide.setAttributeNS(null, "y1", s.y1);
+	    newSide.setAttributeNS(null, "x2", s.x2);
+	    newSide.setAttributeNS(null, "y2", s.y2);
+	    newSide.setAttributeNS(null, "class", "side");
+        tiles.elem.appendChild(newSide);
+        
+        //Creates an SVG line element for hovering.
+        var newSideArea = document.createElementNS(svgNS, "line");
+	    newSideArea.setAttributeNS(null, "id", "sideArea" + s.num);
+	    newSideArea.setAttributeNS(null, "x1", s.x1);
+	    newSideArea.setAttributeNS(null, "y1", s.y1);
+	    newSideArea.setAttributeNS(null, "x2", s.x2);
+	    newSideArea.setAttributeNS(null, "y2", s.y2);
+	    newSideArea.setAttributeNS(null, "class", "side-area");
+        newSideArea.setAttributeNS(null, "onclick", "buildRoad(" + s.num + ")");
+        newSideArea.onmouseover = function() {
+                newSide.style.stroke = "#EF9B00";
+        }
+        newSideArea.onmouseout = function() {
+                newSide.style.stroke = "#BC202B";
+        }
+        builds.appendChild(newSideArea);
+
+        s.areaElem = newSideArea;
+        
+	    return newSide;
+    }
+
+    function buildVertices() {
+        for(i = 0; i < tile.length; i++) {
+            let t = tile[i];
+            for(d = 0; d < 6; d++) {
+                // d represents each Direction,
+                // pd represents the oPposite Direction,
+                // j represents the Adjacent direction.
+                // pj represents the oPposite of the adJacent direction.
+                let pd, j, pj;
+                if(d < 2) {
+                    pd = d + 4;
+                } else {
+                    pd = d - 2;
+                }
+                if(d == 0) {
+                    j = 5;
+                } else {
+                    j = d - 1;
+                }
+                if(j < 3) {
+                    pj = j + 3;
+                } else {
+                    pj = j - 3;
+                }
+                // Check if vertex already exists on its own tile or the adjacent tile, if applicable.
+                if(!t.vertices[d]) {
+                    // Add vertex to tile object and to adjacent if applicable.
+                    t.vertices[d] = createVertex(t, t.adj[j], t.adj[d], t.xCoords[d], t.yCoords[d]);
+                    if(t.adj[j]) t.adj[j].vertices[pj] = t.vertices[d];
+                    if(t.adj[d]) t.adj[d].vertices[pd] = t.vertices[d];
+                }
+            }
+        }
+    }
+
+    function createVertex(t, j1, j2, x, y) {
+	    var n = vertex.length;
+	
+	    vertex[n] = new Object();
+	    vertex[n].num = n;
+	    vertex[n].x = x;
+	    vertex[n].y = y;
+
+	    vertex[n].tiles = [t, j1, j2];
+
+	    vertex[n].adj = [];	
+	    vertex[n].sides = [];
+	
+	    vertex[n].build = undefined;
+    
+        return vertex[n];
+    }
+
+    function drawVertex(v) {
+	    //Creates an SVG circle element for each individual vertex.
+	    var newVertex = document.createElementNS(svgNS, "circle");
+	    newVertex.setAttributeNS(null, "id", "vertex" + v.num);
+	    newVertex.setAttributeNS(null, "cx", v.x);
+	    newVertex.setAttributeNS(null, "cy", v.y);
+	    newVertex.setAttributeNS(null, "class", "vertex");
+	    newVertex.setAttributeNS(null, "onclick", "buildBuilding(" + v.num + ")");
+	    builds.appendChild(newVertex);
+	    return newVertex;
+    }
+
+    function findAdj() {
+        // Add sides adjacent to each other.
+
+        for(i = 0; i < side.length; i++) {
+            let s = side[i];
+
+            for(n = 0; n < s.tiles.length; n++) {
+                let t = s.tiles[n];
+                if(t) {
+                    for(d = 0; d < 6; d++) {
+                        // b is for Before.
+                        // a is for After.
+                        let b, a;
+                        if(d == 0) {
+                            b = 5;
+                        } else {
+                            b = d - 1;
+                        }
+                        if(d == 5) {
+                            a = 0;
+                        } else {
+                            a = d + 1;
+                        }
+                        if(s == t.sides[d]) {
+                            if(t.sides[b]) s.adj.push(t.sides[b]);
+                            if(t.sides[a]) s.adj.push(t.sides[a]);
+
+                            if(!s.tiles[n - 1] && !s.tiles[n + 1]) {
+                                if(t.adj[b]) {
+                                    s.adj.push(t.adj[b].sides[a]);
+                                } else if(t.adj[a]) {
+                                    s.adj.push(t.adj[a].sides[b]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+	    }
+
+        for(i = 0; i < vertex.length; i++) {
+            let v = vertex[i];
+            for(n = 0; n < v.tiles.length; n++) {
+                if(v.tiles[n]) {
+                    let t = v.tiles[n];
+                    for(d = 0; d < 6; d++) {
+                        // b is for Before.
+                        // a is for After.
+                        let b, a;
+                        if(d == 0) {
+                            b = 5;
+                        } else {
+                            b = d - 1;
+                        }
+                        if(d == 5) {
+                            a = 0;
+                        } else {
+                            a = d + 1;
+                        }
+                        if(v == t.vertices[d]) {
+                            if(!v.adj.includes(t.vertices[b])) v.adj.push(t.vertices[b]);
+                            if(!v.adj.includes(t.vertices[a])) v.adj.push(t.vertices[a]);
+                            if(!v.sides.includes(t.sides[b])) {
+                                v.sides.push(t.sides[b]);
+                                t.sides[b].vertices.push(v);
+                            }
+                            if(!v.sides.includes(t.sides[d])) {
+                                v.sides.push(t.sides[d]);
+                                t.sides[d].vertices.push(v);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function drawBoard() {
+        for(n = 0; n < tile.length; n++) {
+            tile[n].elem = drawTile(tile[n]);
+            if(tile[n].token) tile[n].tokenElem = drawToken(tile[n]);	
+        }
+        for(n = 0; n < side.length; n++) {
+            side[n].elem = drawSide(side[n]);
+        }
+        for(n = 0; n < vertex.length; n++) {
+            vertex[n].elem = drawVertex(vertex[n]);
+        }
+    }
+
+    function initPlayers() {
+        // Create new player.
+        // On new player added:
+        if(1 == 1) {
+            player[player.length + 1] = new Object();
+            let p = player[player.length - 1];
+	        p.num = 0;
+            // Player assets.
+	        p.cards = [];
+            p.road = [];
+            p.settle = [];
+            p.city = [];
+            p.devCards = [];
+            p.harbours = [];
+            // Does player have enough cards to build?
+            p.canRoad = false;
+            p.canSettle = false;
+            p.canCity = false;
+            p.canDevCard = false;
+        }
+
+        // Send back to client:
+        localNum = 1;
+        localPlayer = player[localNum];
+
+        // On colour choice:
+        var choice = 3;
+        if(1 == 1) {
+            let p = player[localNum];
+            p.colour = choice;
+            p.roadColour = roadColours[choice];
+            p.settleImg = settleImgs[choice];
+            p.cityImg = cityImgs[choice];
+            p.roadCursor = roadCursors[choice];
+            p.settleCursor = settleCursors[choice];
+            p.cityCursor = cityCursors[choice];
+        }
+
+        // Testing again.
+        localPlayer.cards.push(0);
+        localPlayer.cards.push(0);
+        localPlayer.cards.push(1);
+        localPlayer.cards.push(2);
+        localPlayer.cards.push(3);
+        localPlayer.cards.push(4);
+        localPlayer.cards.push(4);
+
+        updateCards(localNum);
+    }
+    
+    function rollDice() {
+	    //if(stage != "roll") return;
+        var randomizerA = 0;
+        var randomizerB = 0;
+        var i = 0;
+        // Disable roll button.
+        document.getElementById("rollButton").disabled = true;
+        // Initiate animation.
+        document.getElementById("diceA").className = "dice-img rolling";
+        document.getElementById("diceB").className = "dice-img rolling";
+
+        // Animate numbers shuffling.
+        setTimeout(function animate() {
+            i++;
+            if(i == 6) {
+                // Set current number as final number.
+                document.getElementById("diceA").className = "dice-img";
+                document.getElementById("diceB").className = "dice-img";
+	            var roll = randomizerA + randomizerB;
+                document.getElementById("diceNum").innerHTML = roll;
+	            doRoll(roll, localPlayer);
+                return;
+            } else {
+                // Recursive.
+                setTimeout(animate, 13 + i * 70);
+            }
+            // Add a random value to randomize (ensures that numbers will not be the same during shuffling, which can look laggy).
+            randomizerA += Math.floor(Math.random() * 5) + 1;
+	        randomizerB += Math.floor(Math.random() * 5) + 1;
+            if(randomizerA > 6) randomizerA -= 6;
+            if(randomizerB > 6) randomizerB -= 6;
+
+            // Change image.
+            document.getElementById("diceA").src = "images/diceA" + randomizerA + ".png";
+	        document.getElementById("diceB").src = "images/diceB" + randomizerB + ".png";
+        }, 20);
+    }
+
+    function doRoll(n, p) {
+        updateStage("action");
+        console.log(n + ":");
+        console.log()
+        if(n == 7) {
+            doRobber(p);
+            return;
+        } else {
+            for(i = 0; i < vertex.length; i++) {
+                let v = vertex[i];
+                for(t = 0; t < v.tiles.length; t++) {
+                    if(v.tiles[t] && v.tiles[t].token == n) {
+                        if(v.build <= player.length) {
+                            player[v.build].cards.push(v.tiles[t].resource);
+                            console.log("added resource");
+                        } else if(v.build > player.length) {
+                            player[v.build - player.length].cards.push(v.tiles[t].resource);
+                            player[v.build - player.length].cards.push(v.tiles[t].resource);
+                        }
+                        updateCards(localNum);
+                    }
+                }
+            }
+        }
+    }
+
+    function doRobber(p) {
+        console.log("i rob");
+    }
+
+    function updateStage(s) {
+        var caption = document.getElementById("caption-txt");
+        var wrapper = document.getElementById("wrapper");
+        wrapper.className = undefined;
+        if(s !== "refresh") stage = s;
+        hideGuides();
+        disableButtons();
+        if(stage == "choose-player") {
+            console.log("PLACEHOLDER: Choose player stage skipped.");
+            updateStage("first-settle");
+        } else if(stage == "first-settle" || stage == "second-settle" || stage == "settle") {
+            wrapper.className = player[localNum].settleCursor;
+            displayVertices();
+        } else if(stage == "first-road" || stage == "second-road" || stage == "road") {
+            wrapper.className = player[localNum].roadCursor;
+            displaySides();
+        } else if(stage == "roll") {
+            caption.innerHTML = "It's your turn! Roll the dice.";
+            document.getElementById("rollButton").disabled = false;
+        } else if(stage == "action") {
+            caption.innerHTML = "Perform an action or end your turn."
+            document.getElementById("endButton").disabled = false;
+            if(localPlayer.canRoad == true) document.getElementById("roadButton").disabled = false;
+            if(localPlayer.canSettle == true) document.getElementById("settleButton").disabled = false;
+            if(localPlayer.canCity == true) document.getElementById("cityButton").disabled = false;
+            //if(localPlayer.canDevCard == true) document.getElementById("devButton").disabled = false;
+        }
+
+        if(stage == "first-settle") caption.innerHTML = "It's your turn to place your first settlement.";
+        if(stage == "first-road" || s == "second-road") caption.innerHTML = "Place a road connecting to your settlement.";
+        if(stage == "second-settle") caption.innerHTML = "It's your turn to place your second settlement. You will receive the surrounding resources.";
+        if(stage == "road") caption.innerHTML = "Place a road.";
+        if(stage == "settle") caption.innerHTML = "Place a settlement.";
+    }
+
+    function disableButtons() {
+        var buttons = document.getElementsByTagName("button");
+        for(b = 0; b < buttons.length; b++) {
+            buttons[b].disabled = true;
+        }
+    }
+
+    function hideGuides() {
+        for(i = 0; i < vertex.length; i++) {
+		    vertex[i].elem.style.visibility = "hidden";
+	    }
+        for(i = 0; i < side.length; i++) {
+            side[i].elem.style.visibility = "hidden";
+            side[i].areaElem.style.visibility = "hidden";
+        }
+    }
+
+    function displayVertices() {
+        if(stage == "first-settle" || stage == "second-settle") {
+            for(i = 0; i < vertex.length; i++) {
+                let v = vertex[i];
+			    v.elem.style.visibility = "visible";
+			    for(j = 0; j < v.adj.length; j++) {
+				    if(v.build || v.adj[j].build) v.elem.style.visibility = "hidden";
+			    }
+		    }
+		    return;	
+        } else {
+            for(i = 0; i < vertex.length; i++) {
+                let v = vertex[i];
+		        for(s = 0; s < v.sides.length; s++) {
+			        if(v.sides[s].build) v.elem.style.visibility = "visible";
+		        }
+		        for(j = 0; j < v.adj.length; j++) {
+			        if(v.build|| v.adj[j].build) v.elem.style.visibility = "hidden";
+		        }
+	        }
+        }
+    }
+
+    function displaySides() {
+        if(stage == "first-road" || stage == "second-road") {
+            // Display roads connected to settlement placed prior.
+			for(n = 0; n < vertex.length; n++) {
+				if(vertex[n].build) {
+                    let firstSettled = false;
+                    // If settlement already has a road, turn off guides.
+                    for(s = 0; s < vertex[n].sides.length; s++) {
+                        if(vertex[n].sides[s].build) firstSettled = true;
+                    }
+                    if(firstSettled == false) {
+                        for(s = 0; s < vertex[n].sides.length; s++) {
+                            vertex[n].sides[s].elem.style.visibility = "visible";
+                            vertex[n].sides[s].areaElem.style.visibility = "visible";
+                        }
+                    }
+                }
+			}
+        } else {
+            for(i = 0; i < side.length; i++) {
+		        if(side[i].build) {
+			        for(j = 0; j < side[i].adj.length; j++) {
+				        if(!side[i].adj[j].build) {
+                            side[i].adj[j].elem.style.visibility = "visible";
+                            side[i].adj[j].areaElem.style.visibility = "visible";
+                        }
+			        }
+		        }
+            }
+	    }
+    }
+
+    function buildBuilding(i) {
+	var v = vertex[i];
+	if(stage == "first-settle" || "second-settle" || "settle") {
+        drawSettle(v);
+        v.build = localNum;
+    } else if(stage == "city") {
+        drawCity(v);
+        v.build = localNum + player.length;
+    }
+
+    if(stage == "first-settle") updateStage("first-road");
+    if(stage == "second-settle") {
+        updateStage("second-road");
+        for(i = 0; i < v.tiles.length; i++) {
+			if(v.tiles[i].resource != 5) localPlayer.cards.push(v.tiles[i].resource);
+		}
+    }
+    if(stage == "settle") {
+        updateStage("action");
+        for(c = 0; c < localPlayer.cards.length; c++) {
+			if(localPlayer.cards[c] == 0) {
+				localPlayer.cards.splice(c, 1);
+				break;
+			}
+		}
+
+		for(c = 0; c < localPlayer.cards.length; c++) {
+			if(localPlayer.cards[c] == 1) {
+				localPlayer.cards.splice(c, 1);
+				break;
+			}
+		}
+
+		for(c = 0; c < localPlayer.cards.length; c++) {
+			if(localPlayer.cards[c] == 3) {
+				localPlayer.cards.splice(c, 1);
+				break;
+			}
+		}
+
+		for(c = 0; c < localPlayer.cards.length; c++) {
+			if(localPlayer.cards[c] == 4) {
+				localPlayer.cards.splice(c, 1);
+				break;
+			}
+		}
+    }
+    updateCards(localNum);
+    }
+
+    function buildRoad(num) {
+	    var s = side[num];
+	    if(!s.build) {
+		    drawRoad(s);
+		    s.build = localNum;
+	    }
+
+	    if(stage == "first-road") updateStage("second-settle");
+	    if(stage == "second-road") updateStage("roll");
+	    if(stage == "road") {
+		    updateStage("action");
+		    for(c = 0; c < localPlayer.cards.length; c++) {
+			    if(localPlayer.cards[c] == 0) {
+				    localPlayer.cards.splice(c, 1);
+				    break;
+			    }
+		    }
+
+		    for(c = 0; c < localPlayer.cards.length; c++) {
+			    if(localPlayer.cards[c] == 4) {
+				    localPlayer.cards.splice(c, 1);
+				    break;
+			    }
+		    }
+            updateCards(localNum);
+	    }
+    }
+
+    function drawSettle(v) {
+	    var newSettle = document.createElementNS(svgNS, "image");
+	    newSettle.setAttributeNS(null, "x", v.x - 3);
+	    newSettle.setAttributeNS(null, "y", v.y - 3);
+	    newSettle.setAttributeNS(null, "width", "6");
+	    newSettle.setAttributeNS(null, "height", "6");
+	    newSettle.setAttributeNS(null, "href", localPlayer.settleImg);
+	    builds.appendChild(newSettle);
+    }
+
+    function drawCity(v) {
+
+    }
+
+    function drawRoad(s) {
+	    var newRoad = document.createElementNS(svgNS, "line");
+	    newRoad.setAttributeNS(null, "id", "road" + s.num);
+	    newRoad.setAttributeNS(null, "x1", s.x1);
+	    newRoad.setAttributeNS(null, "y1", s.y1);
+	    newRoad.setAttributeNS(null, "x2", s.x2);
+	    newRoad.setAttributeNS(null, "y2", s.y2);
+	    newRoad.setAttributeNS(null, "class", "road");
+        newRoad.setAttributeNS(null, "stroke", localPlayer.roadColour)
+	    tiles.elem.appendChild(newRoad);
+    }
+
+    function updateCards(num) {
+        var p = player[num];
+        var hand = document.getElementById("hand");
+        var handWrapper = document.getElementById("hand-wrapper");
+        hand.innerHTML = "";
+        var cards = p.cards;
+        cardHeight = 100 - 20;
+	    cardWidth = cardHeight*0.67
+	    if(cards.length < 7) {
+		    var cardX = cardWidth*(2/3);
+	    } else {
+		    var cardX = (handWrapper.offsetWidth - cardWidth) / (cards.length - 1);
+	    }
+	    var cardsWidth = cardX*(cards.length-1) + cardWidth
+	    var cardsMargin = (handWrapper.offsetWidth - cardsWidth)/2;
+        console.log(handWrapper.offsetWidth);
+	    for(x = 0; x < cards.length; x++) {
+            console.log()
+		    drawCard(x, cards[x], cardsMargin + cardX*x);
+	    }
+
+        if(cards.includes(0) && cards.includes(4)) {
+		    p.canRoad = true;
+	    } else {
+            p.canRoad = false;
+        }
+
+	    if(cards.includes(0) && cards.includes(1) && cards.includes(3) && cards.includes(4)) {
+		    p.canSettle = true;
+	    } else {
+            p.canSettle = false;
+        }
+
+        if(cards.includes(2) && cards.includes(3)) {
+            let cardCheck = new Object();
+            cardCheck.stone = 0;
+            cardCheck.wheat = 0;
+            for(c = 0; c < cards.length; c++) {
+                if(cards[c] == 2) cardCheck.stone++;
+                if(cards[c] == 3) cardCheck.wheat++
+            }
+            if(cardCheck.stone > 2 && cardCheck.wheat > 1) p.canCity == true;
+        } else {
+            p.canCity = false;
+        }
+
+        updateStage("refresh");
+    }
+
+    function drawCard(n, res, x) {
+	    localCard[n] = new Object;
+	    localCard[n].num = n;
+	    localCard[n].resource = res;
+	    localCard[n].select = false;
+	    //Creates an SVG element for each individual card.
+	    var newCard = document.createElementNS(svgNS, "image");
+	    newCard.setAttributeNS(null, "id", "card" + n);
+	    newCard.setAttributeNS(null, "x", x);
+	    newCard.setAttributeNS(null, "y", 20);
+	    newCard.setAttributeNS(null, "width", cardWidth);
+	    newCard.setAttributeNS(null, "height", cardHeight);
+	    newCard.setAttributeNS(null, "href", tileImg[res].slice(0, 7) + "card" + tileImg[res].slice(7));
+	    newCard.setAttributeNS(null, "class", "cards");
+	    newCard.setAttributeNS(null, "onclick", "cardClick("+n+")");
+	    document.getElementById("hand").appendChild(newCard);
+    }
+
+    function cardClick(n) {
+        console.log("card clicked");
+    }
+
+    function clickRoad() {
+        updateStage("road");
+    }
+
+    function clickSettle() {
+        updateStage("settle");
+    }
+
+    function clickCity() {
+        console.log("city placeholder");
+    }
+
+    function endTurn() {
+        var turn;
+        if(localNum + 1 > player.length) {
+            turn = 1;
+        } else {
+            turn = localNum + 1;
+        }
+        for(p = 1; p <= player.length; p++) {
+            updateStage("wait");
+        }
+        updateStage("roll");
+    }
+
+    /*
+
+    Things left to do:
+    - Choose player screen and lobby, including a stage
+    - Make buttons say "cancel" when building as an option
+    - If no empty spaces are available button should be greyed out
+    - Check why the building isn't working
+    - Add all built on vertices to player settle and city arrays, same with sides and roads
+    - Implement harbours as well as a 4 - 1 trading port on the side
+    - Test with two players
+    - Implement the robber as a moving SVG circle
+    - Implement cities ** easy, just need images
+    - Implement development cards that show up on the side (just knights for now)
+    - Keep a local count of roads, longest road, settlements, cities, knights, and total victory points
+    - Display an ugly win screen when a player has 10 points
+    - Show players on the left
+    - Make cards raise when clicked, and also lower / raise when build buttons are clicked
+    - Make button images
+    - Cry
+    - Finally put it all in socket.io!!!!
+
+    */
+
+
+    </script>
+
+
+    <div id="wrapper">
+
+        <div id="column-left" class="column">
+
+            <div id="dice">
+
+                <div id="diceNum">9</div>
+                
+                <div id="dice-top">
+                    <img id="diceA" class="dice-img" src="images/diceA1.png" />
+		            <img id="diceB" class="dice-img" src="images/diceB1.png" />
+                </div>
+                
+                <button type="button" id="rollButton" disabled = "true" onClick="rollDice()">Roll</button>
+                
+            </div>
+
+        </div>
+
+        <div id="column-middle" class="column">
+
+            <div id="caption">
+                <p id="caption-txt">Instructions</p>
+            </div>
+
+            <div id="board-wrapper-border">
+                <div id="board-wrapper-img">
+                    <div id="board">
+                            <svg id="tiles" viewBox="0 0 100 92.3" preserveAspectRatio="none"></svg>
+                            <svg id="builds" viewBox="0 0 100 92.3" preserveAspectRatio="none"></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div id="hand-wrapper">
+                <svg id="hand"></svg>
+            </div>
+
+        </div>
+
+        <div id="column-right" class="column">
+
+            <div id="actions">
+                <div id="action-grid">
+                    <button type="button" id="roadButton" disabled onClick="clickRoad()">Road</button>
+		            <button type="button" id="settleButton" disabled onClick="clickSettle()">Settlement</button>
+                    <button type="button" id="cityButton" disabled onClick="clickCity()">City</button>
+                    <button type="button" id="devButton" disabled onClick="clickDev()">Development Card</button>
+		            <button type="button" id="endButton" disabled onClick="endTurn()">End turn</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+</body>
